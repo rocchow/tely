@@ -76,14 +76,14 @@ export default async function SingleProductPage(props: {
 	const category = product.metadata.category;
 
 	// Combine main product images with additional images from metadata
-	const additionalImages = Object.keys(product.metadata)
-		.filter((key) => key.startsWith("image") && key !== "image1")
-		.sort((a, b) => {
+	const additionalImages = Object.entries(product.metadata)
+		.filter(([key]) => key.startsWith("image") && key !== "image1")
+		.sort(([a], [b]) => {
 			const numA = parseInt(a.replace("image", ""), 10);
 			const numB = parseInt(b.replace("image", ""), 10);
 			return numA - numB;
 		})
-		.map((key) => product.metadata[key])
+		.map(([, value]) => value)
 		.filter((url): url is string => typeof url === "string" && url.startsWith("http"));
 
 	const images = [...product.images, ...additionalImages];
