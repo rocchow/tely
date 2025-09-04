@@ -24,7 +24,7 @@ export function ProductImageGallery({ images, productName, className }: ProductI
 		);
 	}
 
-	const selectedImage = images[selectedImageIndex] || images[0];
+	const selectedImage = images[selectedImageIndex] || images[0] || "";
 	const hasPrevious = selectedImageIndex > 0;
 	const hasNext = selectedImageIndex < images.length - 1;
 
