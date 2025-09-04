@@ -15,7 +15,8 @@ import { ProductList } from "./commercegpt/product-list";
 import { YnsLink } from "./yns-link";
 
 export function CommerceGPT() {
-  const { messages, handleSubmit, append, data, isLoading } = useChat({});
+  // v5: no handleSubmit/append; use sendMessage instead
+  const { messages, sendMessage, data, isLoading, error, clearError } = useChat({});
   const [input, setInput] = useState("");
 
   useEffect(() => {
@@ -100,9 +101,7 @@ export function CommerceGPT() {
                       variant="outline"
                       className="text-lg text-neutral-500"
                       size="lg"
-                      onClick={() =>
-                        append({ role: "user", content: "Show me some bags" })
-                      }
+                      onClick={() => sendMessage("Show me some bags")}
                     >
                       Show me some bags
                     </Button>
@@ -110,12 +109,7 @@ export function CommerceGPT() {
                       variant="outline"
                       className="text-lg text-neutral-500"
                       size="lg"
-                      onClick={() =>
-                        append({
-                          role: "user",
-                          content: "Show me cool sunglasses",
-                        })
-                      }
+                      onClick={() => sendMessage("Show me cool sunglasses")}
                     >
                       Looking for cool glasses
                     </Button>
@@ -139,10 +133,7 @@ export function CommerceGPT() {
                         : "bg-neutral-100"
                     }`}
                   >
-                    {/* content can be string or structured; render strings plainly */}
-                    {typeof m.content === "string"
-                      ? m.content
-                      : (m.content as any)}
+                    {typeof m.content === "string" ? m.content : (m.content as any)}
 
                     {(m as any).toolInvocations?.map((ti: any) => {
                       return (
@@ -162,11 +153,7 @@ export function CommerceGPT() {
                                           className="text-lg text-neutral-500"
                                           size="lg"
                                           onClick={() =>
-                                            append({
-                                              role: "user",
-                                              content:
-                                                "Add the first product to the cart",
-                                            })
+                                            sendMessage("Add the first product to the cart")
                                           }
                                         >
                                           Add the first product to the cart
@@ -193,15 +180,18 @@ export function CommerceGPT() {
               ))}
             </div>
 
+            {/* v5: submit by calling sendMessage with your input */}
             <form
               onSubmit={(e) => {
-                handleSubmit(e);
+                e.preventDefault();
+                if (input.trim().length === 0) return;
+                if (error) clearError();
+                sendMessage(input);
                 setInput("");
               }}
               className="flex space-x-2 items-center"
             >
               <Input
-                name="input" // required by useChat v5 handleSubmit
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="What do you want to buy today?"
