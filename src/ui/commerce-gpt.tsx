@@ -14,23 +14,37 @@ import { Input } from "@/components/ui/input";
 import { ProductList } from "./commercegpt/product-list";
 import { YnsLink } from "./yns-link";
 
+type CartEvent = { operation?: "cartAdd"; cartId: string };
+
 export function CommerceGPT() {
-  // v5: no handleSubmit/append; use sendMessage instead
-  const { messages, sendMessage, data, isLoading, error, clearError } = useChat({});
+  // v5: use sendMessage; stream extra "data parts" via onData
+  const [dataParts, setDataParts] = useState<any[]>([]);
+  const { messages, sendMessage, isLoading, error, clearError } = useChat({
+    // collect any streamed data parts
+    onData(part) {
+      // part is a DataUIPart; its exact shape depends on what your /api/chat sends
+      // we just stash it; you can refine this if you control the server shape
+      setDataParts((prev) => [...prev, (part as any).data ?? part]);
+    },
+  });
+
   const [input, setInput] = useState("");
 
+  // look for `{ operation: "cartAdd", cartId }` in streamed data parts
   useEffect(() => {
-    const d =
-      (data as Array<{ operation?: "cartAdd"; cartId: string } | undefined>) ??
-      undefined;
-    const cartId = d?.find((x) => x?.operation === "cartAdd")?.cartId;
-    if (cartId) {
+    // flatten arrays-of-arrays defensively, then find the first cartAdd
+    const flat = dataParts.flat();
+    const evt = flat.find(
+      (x: any) => x && typeof x === "object" && x.operation === "cartAdd" && x.cartId,
+    ) as CartEvent | undefined;
+
+    if (evt?.cartId) {
       startTransition(async () => {
-        await setInitialCartCookiesAction(cartId, 1);
+        await setInitialCartCookiesAction(evt.cartId, 1);
         await commerceGPTRevalidateAction();
       });
     }
-  }, [data]);
+  }, [dataParts]);
 
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
@@ -133,7 +147,9 @@ export function CommerceGPT() {
                         : "bg-neutral-100"
                     }`}
                   >
-                    {typeof m.content === "string" ? m.content : (m.content as any)}
+                    {typeof (m as any).content === "string"
+                      ? (m as any).content
+                      : (m as any).content}
 
                     {(m as any).toolInvocations?.map((ti: any) => {
                       return (
@@ -153,7 +169,9 @@ export function CommerceGPT() {
                                           className="text-lg text-neutral-500"
                                           size="lg"
                                           onClick={() =>
-                                            sendMessage("Add the first product to the cart")
+                                            sendMessage(
+                                              "Add the first product to the cart",
+                                            )
                                           }
                                         >
                                           Add the first product to the cart
@@ -180,7 +198,6 @@ export function CommerceGPT() {
               ))}
             </div>
 
-            {/* v5: submit by calling sendMessage with your input */}
             <form
               onSubmit={(e) => {
                 e.preventDefault();
