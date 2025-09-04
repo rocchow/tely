@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 		console.log(`Updating product with ${allImages.length} total images`);
 
 		// Update the Stripe product with all images
-		const updatedProduct = await stripe.products.update(productId, {
+		await stripe.products.update(productId, {
 			images: allImages,
 		});
 
