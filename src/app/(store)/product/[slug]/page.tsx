@@ -74,7 +74,19 @@ export default async function SingleProductPage(props: {
 	const locale = await getLocale();
 
 	const category = product.metadata.category;
-	const images = product.images;
+
+	// Combine main product images with additional images from metadata
+	const additionalImages = Object.keys(product.metadata)
+		.filter((key) => key.startsWith("image") && key !== "image1")
+		.sort((a, b) => {
+			const numA = parseInt(a.replace("image", ""), 10);
+			const numB = parseInt(b.replace("image", ""), 10);
+			return numA - numB;
+		})
+		.map((key) => product.metadata[key])
+		.filter((url): url is string => typeof url === "string" && url.startsWith("http"));
+
+	const images = [...product.images, ...additionalImages];
 
 	return (
 		<article className="pb-12">
