@@ -22,7 +22,7 @@ import type { TrieveProductMetadata } from "@/scripts/upload-trieve";
 import { AddToCartButton } from "@/ui/add-to-cart-button";
 import { JsonLd, mappedProductToJsonLd } from "@/ui/json-ld";
 import { Markdown } from "@/ui/markdown";
-import { MainProductImage } from "@/ui/products/main-product-image";
+import { ProductImageGallery } from "@/ui/products/product-image-gallery";
 import { StickyBottom } from "@/ui/sticky-bottom";
 import { YnsLink } from "@/ui/yns-link";
 
@@ -141,45 +141,7 @@ export default async function SingleProductPage(props: {
 					<div className="lg:col-span-7 lg:row-span-3 lg:row-start-1">
 						<h2 className="sr-only">{t("imagesTitle")}</h2>
 
-						<div className="grid gap-4 lg:grid-cols-3 [&>*:first-child]:col-span-3">
-							{/* {product.metadata.preview && (
-								<ProductModel3D model3d={product.metadata.preview} imageSrc={product.images[0]} />
-							)} */}
-							{images.map((image, idx) => {
-								const params = new URLSearchParams({
-									image: idx.toString(),
-								});
-								if (searchParams.variant) {
-									params.set("variant", searchParams.variant);
-								}
-								return (
-									<YnsLink key={idx} href={`?${params}`} scroll={false}>
-										{idx === 0 && !product.metadata.preview ? (
-											<MainProductImage
-												key={image}
-												className="w-full rounded-lg bg-neutral-100 object-cover object-center transition-opacity"
-												src={image}
-												loading="eager"
-												priority
-												alt=""
-											/>
-										) : (
-											<Image
-												key={image}
-												className="w-full rounded-lg bg-neutral-100 object-cover object-center transition-opacity"
-												src={image}
-												width={700 / 3}
-												height={700 / 3}
-												sizes="(max-width: 1024x) 33vw, (max-width: 1280px) 20vw, 225px"
-												loading="eager"
-												priority
-												alt=""
-											/>
-										)}
-									</YnsLink>
-								);
-							})}
-						</div>
+						<ProductImageGallery images={images} productName={product.name} className="w-full" />
 					</div>
 
 					<div className="grid gap-8 lg:col-span-5">

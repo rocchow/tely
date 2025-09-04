@@ -53,15 +53,30 @@ export function ProductImageUploader({ product }: ProductImageUploaderProps) {
 				body: formData,
 			});
 
-			const result = (await response.json()) as { error?: string; success?: boolean };
+			const result = (await response.json()) as {
+				error?: string;
+				success?: boolean;
+				message?: string;
+				uploadedUrls?: string[];
+				totalImages?: number;
+				instructions?: string[];
+			};
 
-			if (response.ok) {
-				setMessage({ type: "success", text: `Successfully uploaded ${images.length} images!` });
+			if (result.success) {
+				const successMessage =
+					result.message || `Successfully uploaded ${result.uploadedUrls?.length || images.length} images!`;
+				setMessage({ type: "success", text: successMessage });
 				setImages([]);
 				// Refresh the page to show updated images
 				window.location.reload();
 			} else {
-				setMessage({ type: "error", text: result.error || "Failed to upload images." });
+				const errorMessage = result.message || result.error || "Failed to upload images.";
+				setMessage({ type: "error", text: errorMessage });
+
+				// Log setup instructions if provided
+				if (result.instructions) {
+					console.log("Setup instructions:", result.instructions);
+				}
 			}
 		} catch (error) {
 			setMessage({ type: "error", text: "An error occurred while uploading images." });

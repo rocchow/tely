@@ -18,6 +18,9 @@ export const env = createEnv({
 
 		TRIEVE_DATASET_ID: z.string().optional(),
 		TRIEVE_API_KEY: z.string().optional(),
+
+		// Vercel Blob Storage
+		BLOB_READ_WRITE_TOKEN: z.string().optional(),
 	},
 	client: {
 		// Can be provided via env or parameters to Commerce Kit, thus optional
@@ -44,6 +47,8 @@ export const env = createEnv({
 
 		TRIEVE_DATASET_ID: process.env.TRIEVE_DATASET_ID,
 		TRIEVE_API_KEY: process.env.TRIEVE_API_KEY,
+
+		BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
 
 		NEXT_PUBLIC_LANGUAGE: process.env.NEXT_PUBLIC_LANGUAGE,
 	},

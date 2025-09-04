@@ -1,3 +1,4 @@
+import { put } from "@vercel/blob";
 import * as Commerce from "commerce-kit";
 import { type NextRequest, NextResponse } from "next/server";
 import { env } from "@/env.mjs";
@@ -11,9 +12,7 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
 		}
 
-		// Add more detailed logging
 		console.log(`Processing upload for product: ${productId}`);
-		console.log(`Number of images to upload: ${formData.getAll("images").length}`);
 
 		// Initialize Stripe
 		const stripe = Commerce.provider({
@@ -22,15 +21,37 @@ export async function POST(request: NextRequest) {
 			cache: "no-store",
 		});
 
-		// Get current product to preserve existing metadata
+		// Get current product
 		const currentProduct = await stripe.products.retrieve(productId);
+		if (!currentProduct) {
+			return NextResponse.json({ error: "Product not found" }, { status: 404 });
+		}
+
+		// Check if Vercel Blob token is configured
+		if (!env.BLOB_READ_WRITE_TOKEN) {
+			return NextResponse.json(
+				{
+					error: "Vercel Blob Storage not configured",
+					message: "Please add BLOB_READ_WRITE_TOKEN to your environment variables",
+					instructions: [
+						"1. Go to your Vercel dashboard",
+						"2. Navigate to Storage > Blob",
+						"3. Create a new Blob store if you haven't already",
+						"4. Copy the BLOB_READ_WRITE_TOKEN",
+						"5. Add it to your .env.local file",
+						"6. Restart your development server",
+					],
+				},
+				{ status: 400 },
+			);
+		}
 
 		// Collect all image files from formData
 		const imageFiles: File[] = [];
 		let index = 0;
 		while (formData.get(`image${index}`)) {
 			const file = formData.get(`image${index}`) as File;
-			if (file) {
+			if (file && file.size > 0) {
 				imageFiles.push(file);
 			}
 			index++;
@@ -40,72 +61,81 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "No images provided" }, { status: 400 });
 		}
 
-		// Upload images to Stripe Files API
-		const uploadedImages: string[] = [];
+		console.log(`Number of images to upload: ${imageFiles.length}`);
+
+		// Upload images to Vercel Blob Storage
+		const uploadedImageUrls: string[] = [];
 
 		for (const file of imageFiles) {
 			try {
 				console.log(`Uploading file: ${file.name} (${file.type}, ${file.size} bytes)`);
 
-				// Convert File to Buffer
-				const buffer = Buffer.from(await file.arrayBuffer());
-				console.log(`Buffer created, size: ${buffer.length} bytes`);
+				// Validate file type
+				if (!file.type.startsWith("image/")) {
+					throw new Error(`File ${file.name} is not an image`);
+				}
 
-				// Upload to Stripe Files API
-				console.log("Starting Stripe file upload...");
-				const stripeFile = await stripe.files.create({
-					file: {
-						data: buffer,
-						name: file.name,
-						type: file.type,
-					},
-					purpose: "dispute_evidence",
+				// Generate a unique filename
+				const timestamp = Date.now();
+				const randomId = Math.random().toString(36).substring(2, 15);
+				const fileExtension = file.name.split(".").pop() || "jpg";
+				const filename = `product-${productId}-${timestamp}-${randomId}.${fileExtension}`;
+
+				console.log(`Uploading to Vercel Blob as: ${filename}`);
+
+				// Upload to Vercel Blob Storage
+				const blob = await put(filename, file, {
+					access: "public",
+					token: env.BLOB_READ_WRITE_TOKEN,
 				});
 
-				console.log(`Stripe file uploaded successfully: ${stripeFile.id}`);
-				if (stripeFile.url) {
-					uploadedImages.push(stripeFile.url);
-					console.log(`File URL added: ${stripeFile.url}`);
-				}
-			} catch (fileError) {
+				console.log(`Successfully uploaded to Vercel Blob: ${blob.url}`);
+				uploadedImageUrls.push(blob.url);
+			} catch (fileError: unknown) {
 				console.error(`Failed to upload file ${file.name}:`, fileError);
 				// Continue with other files instead of failing completely
 			}
 		}
 
-		// Prepare metadata with additional images
-		const newMetadata: Record<string, string> = { ...currentProduct.metadata };
-
-		// Find the next available image slot (image2, image3, etc.)
-		let imageSlot = 2; // Start from image2 since image1 is typically the main image
-		for (const imageUrl of uploadedImages) {
-			// Find next available slot
-			while (newMetadata[`image${imageSlot}`]) {
-				imageSlot++;
-			}
-			newMetadata[`image${imageSlot}`] = imageUrl;
-			imageSlot++;
+		if (uploadedImageUrls.length === 0) {
+			return NextResponse.json(
+				{
+					error: "No images were successfully uploaded",
+				},
+				{ status: 500 },
+			);
 		}
 
-		// Update the product with new metadata
-		await stripe.products.update(productId, {
-			metadata: newMetadata,
+		// Get existing images from the product
+		const existingImages = currentProduct.images || [];
+
+		// Combine existing images with new ones
+		const allImages = [...existingImages, ...uploadedImageUrls];
+
+		console.log(`Updating product with ${allImages.length} total images`);
+
+		// Update the Stripe product with all images
+		const updatedProduct = await stripe.products.update(productId, {
+			images: allImages,
 		});
 
-		// If this is the first image and there's no main image, set it as the main image
-		if ((!currentProduct.images || currentProduct.images.length === 0) && uploadedImages.length > 0) {
-			await stripe.products.update(productId, {
-				images: [uploadedImages[0]!], // We know this exists because we checked length > 0
-			});
-		}
+		console.log(`Successfully updated product ${productId} with images:`, allImages);
 
 		return NextResponse.json({
 			success: true,
-			message: `Successfully uploaded ${uploadedImages.length} images`,
-			imageUrls: uploadedImages,
+			message: `Successfully uploaded ${uploadedImageUrls.length} images`,
+			uploadedUrls: uploadedImageUrls,
+			totalImages: allImages.length,
+			allImages: allImages,
 		});
-	} catch (error) {
+	} catch (error: unknown) {
 		console.error("Error uploading product images:", error);
-		return NextResponse.json({ error: "Failed to upload images. Please try again." }, { status: 500 });
+		return NextResponse.json(
+			{
+				error: "Failed to upload images",
+				details: error instanceof Error ? error.message : "Unknown error",
+			},
+			{ status: 500 },
+		);
 	}
 }
