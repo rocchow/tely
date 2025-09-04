@@ -5,7 +5,14 @@ import StoreConfig from "@/store.config";
 
 type Item = MetadataRoute.Sitemap[number];
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-	const products = await Commerce.productBrowse({ first: 100 });
+	let products: Awaited<ReturnType<typeof Commerce.productBrowse>> = [];
+
+	try {
+		products = await Commerce.productBrowse({ first: 100 });
+	} catch (error) {
+		console.warn("Failed to fetch products for sitemap, continuing without product URLs:", error);
+	}
+
 	const productUrls = products.map(
 		(product) =>
 			({
