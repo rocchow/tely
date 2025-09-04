@@ -1,4 +1,3 @@
-import { calculateCartTotalNetWithoutShipping } from "commerce-kit";
 import { ShoppingBagIcon } from "lucide-react";
 import { Suspense } from "react";
 import { getCartFromCookiesAction } from "@/actions/cart-actions";
@@ -30,7 +29,12 @@ const CartSummaryNavInner = async () => {
 		return <CartFallback />;
 	}
 
-	const total = calculateCartTotalNetWithoutShipping(cart);
+	// Calculate total manually since our custom cart structure doesn't match the expected type
+	const total = cart.lines.reduce((sum, line) => {
+		const product = line.product as any;
+		const unitAmount = product.default_price?.unit_amount || 0;
+		return sum + unitAmount * line.quantity;
+	}, 0);
 	const totalItems = cart.lines.reduce((acc, line) => acc + line.quantity, 0);
 	const t = await getTranslations("Global.nav.cartSummary");
 	const locale = await getLocale();

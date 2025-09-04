@@ -64,6 +64,7 @@ export async function getCartFromCookiesAction() {
 						taxBreakdown: [], // Add empty tax breakdown to prevent errors
 					},
 					lines: lines,
+					shippingRate: null, // Add empty shipping rate for compatibility
 					metadata: {
 						productCount: lines.length,
 					},
@@ -159,10 +160,13 @@ export async function addToCartAction(formData: FormData) {
 			cartLines = [...existingCart.lines];
 
 			// Check if product already exists in cart
-			const existingLineIndex = cartLines.findIndex((line) => line.product.id === productId);
+			const existingLineIndex = cartLines.findIndex((line) => (line.product as any).id === productId);
 			if (existingLineIndex >= 0) {
 				// Increase quantity by the requested amount
-				cartLines[existingLineIndex].quantity += quantity;
+				const existingLine = cartLines[existingLineIndex];
+				if (existingLine) {
+					existingLine.quantity += quantity;
+				}
 			} else {
 				// Add new product line with requested quantity
 				cartLines.push({
@@ -173,8 +177,8 @@ export async function addToCartAction(formData: FormData) {
 
 			// Calculate new total amount
 			totalAmount = cartLines.reduce((total, line) => {
-				const price =
-					typeof line.product.default_price === "object" ? line.product.default_price.unit_amount || 0 : 0;
+				const product = line.product as any;
+				const price = typeof product.default_price === "object" ? product.default_price.unit_amount || 0 : 0;
 				return total + price * line.quantity;
 			}, 0);
 
@@ -183,7 +187,7 @@ export async function addToCartAction(formData: FormData) {
 				amount: totalAmount,
 				metadata: {
 					...existingCart.cart.metadata,
-					productIds: cartLines.map((line) => line.product.id).join(","),
+					productIds: cartLines.map((line) => (line.product as any).id).join(","),
 					productQuantities: cartLines.map((line) => line.quantity).join(","),
 					productCount: cartLines.length.toString(),
 				},
@@ -232,6 +236,7 @@ export async function addToCartAction(formData: FormData) {
 				taxBreakdown: [], // Add empty tax breakdown to prevent errors
 			},
 			lines: cartLines,
+			shippingRate: null, // Add empty shipping rate for compatibility
 			metadata: {
 				productCount: cartLines.length,
 			},

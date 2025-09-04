@@ -1,1 +1,5 @@
 lint-staged
+
+# Run build check to catch TypeScript errors
+echo "🔍 Running build check..."
+bun run build

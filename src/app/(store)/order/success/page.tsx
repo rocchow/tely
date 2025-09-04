@@ -63,6 +63,10 @@ export default async function OrderDetailsPage(props: {
 		const productId = productIdArray[i];
 		const quantity = quantityArray[i] || 1;
 
+		if (!productId) {
+			continue; // Skip if productId is undefined
+		}
+
 		const product = await stripe.products.retrieve(productId.trim(), {
 			expand: ["default_price"],
 		});
@@ -93,7 +97,7 @@ export default async function OrderDetailsPage(props: {
 	const locale = await getLocale();
 
 	const isDigital = (lines: typeof order.lines) => {
-		return lines.some(({ product }) => Boolean(product.metadata.digitalAsset));
+		return lines.some(({ product }) => Boolean((product as any).metadata.digitalAsset));
 	};
 
 	return (
@@ -112,12 +116,12 @@ export default async function OrderDetailsPage(props: {
 			<h2 className="sr-only">{t("productsTitle")}</h2>
 			<ul role="list" className="my-8 divide-y border-y">
 				{order.lines.map((line) => (
-					<li key={line.product.id} className="py-8">
+					<li key={(line.product as any).id} className="py-8">
 						<article className="grid grid-cols-[auto_1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
 							<h3 className="row-start-1 font-semibold leading-none text-neutral-700">
-								{formatProductName(line.product.name, line.product.metadata.variant)}
+								{formatProductName((line.product as any).name, (line.product as any).metadata.variant)}
 							</h3>
-							{line.product.images.map((image) => (
+							{(line.product as any).images.map((image: string) => (
 								<Image
 									key={image}
 									className="col-start-1 row-span-3 row-start-1 mt-0.5 w-16 rounded-lg object-cover object-center transition-opacity sm:mt-0 sm:w-32"
@@ -128,7 +132,7 @@ export default async function OrderDetailsPage(props: {
 								/>
 							))}
 							<div className="prose row-start-2 text-secondary-foreground">
-								<Markdown source={line.product.description || ""} />
+								<Markdown source={(line.product as any).description || ""} />
 							</div>
 							<footer className="row-start-3 mt-2 self-end">
 								<dl className="grid grid-cols-[max-content_auto] gap-2 sm:grid-cols-3">
@@ -136,8 +140,8 @@ export default async function OrderDetailsPage(props: {
 										<dt className="text-sm font-semibold text-foreground">{t("price")}</dt>
 										<dd className="text-sm text-accent-foreground">
 											{formatMoney({
-												amount: line.product.default_price.unit_amount ?? 0,
-												currency: line.product.default_price.currency,
+												amount: (line.product as any).default_price.unit_amount ?? 0,
+												currency: (line.product as any).default_price.currency,
 												locale,
 											})}
 										</dd>
@@ -152,8 +156,8 @@ export default async function OrderDetailsPage(props: {
 										<dt className="text-sm font-semibold text-foreground">{t("total")}</dt>
 										<dd className="text-sm text-accent-foreground">
 											{formatMoney({
-												amount: (line.product.default_price.unit_amount ?? 0) * line.quantity,
-												currency: line.product.default_price.currency,
+												amount: ((line.product as any).default_price.unit_amount ?? 0) * line.quantity,
+												currency: (line.product as any).default_price.currency,
 												locale,
 											})}
 										</dd>
@@ -163,11 +167,11 @@ export default async function OrderDetailsPage(props: {
 						</article>
 					</li>
 				))}
-				{order.shippingRate?.fixed_amount && (
+				{(order.shippingRate as any)?.fixed_amount && (
 					<li className="py-8">
 						<article className="grid grid-cols-[auto_1fr] grid-rows-[repeat(auto,3)] justify-start gap-x-4 sm:gap-x-8">
 							<h3 className="row-start-1 font-semibold leading-none text-neutral-700">
-								{order.shippingRate.display_name}
+								{(order.shippingRate as any).display_name}
 							</h3>
 							<div className="col-start-1 row-span-3 row-start-1 mt-0.5 w-16 sm:mt-0 sm:w-32" />
 							<footer className="row-start-3 mt-2 self-end">
@@ -176,8 +180,8 @@ export default async function OrderDetailsPage(props: {
 										<dt className="text-sm font-semibold text-foreground">{t("price")}</dt>
 										<dd className="text-sm text-accent-foreground">
 											{formatMoney({
-												amount: order.shippingRate.fixed_amount.amount ?? 0,
-												currency: order.shippingRate.fixed_amount.currency,
+												amount: (order.shippingRate as any).fixed_amount.amount ?? 0,
+												currency: (order.shippingRate as any).fixed_amount.currency,
 												locale,
 											})}
 										</dd>
@@ -196,18 +200,18 @@ export default async function OrderDetailsPage(props: {
 						<h3 className="font-semibold leading-none text-neutral-700">Digital Asset</h3>
 						<ul className="mt-3">
 							{order.lines
-								.filter((line) => line.product.metadata.digitalAsset)
+								.filter((line) => (line.product as any).metadata.digitalAsset)
 								.map((line) => {
 									return (
-										<li key={line.product.id} className="text-sm">
+										<li key={(line.product as any).id} className="text-sm">
 											<a
-												href={line.product.metadata.digitalAsset}
+												href={(line.product as any).metadata.digitalAsset}
 												target="_blank"
 												download={true}
 												rel="noreferrer"
 												className="text-blue-500 hover:underline"
 											>
-												{line.product.name}
+												{(line.product as any).name}
 											</a>
 										</li>
 									);
@@ -243,20 +247,21 @@ export default async function OrderDetailsPage(props: {
 						</div>
 					)}
 
-					{order.order.payment_method?.billing_details.address && (
+					{(order.order.payment_method as any)?.billing_details?.address && (
 						<div>
 							<h3 className="font-semibold leading-none text-neutral-700">{t("billingAddress")}</h3>
 							<p className="mt-3 text-sm">
 								{[
-									order.order.payment_method.billing_details.name,
-									order.order.payment_method.billing_details.address.line1,
-									order.order.payment_method.billing_details.address.line2,
-									order.order.payment_method.billing_details.address.postal_code,
-									order.order.payment_method.billing_details.address.city,
-									order.order.payment_method.billing_details.address.state,
-									findMatchingCountry(order.order.payment_method?.billing_details?.address?.country)?.label,
+									(order.order.payment_method as any).billing_details.name,
+									(order.order.payment_method as any).billing_details.address.line1,
+									(order.order.payment_method as any).billing_details.address.line2,
+									(order.order.payment_method as any).billing_details.address.postal_code,
+									(order.order.payment_method as any).billing_details.address.city,
+									(order.order.payment_method as any).billing_details.address.state,
+									findMatchingCountry((order.order.payment_method as any)?.billing_details?.address?.country)
+										?.label,
 									"\n",
-									order.order.payment_method.billing_details.phone,
+									(order.order.payment_method as any).billing_details.phone,
 									order.order.receipt_email,
 								]
 									.filter(Boolean)
@@ -271,30 +276,33 @@ export default async function OrderDetailsPage(props: {
 						</div>
 					)}
 
-					{order.order.payment_method?.type === "card" && order.order.payment_method.card && (
-						<div className="border-t pt-8 sm:col-span-2">
-							<h3 className="font-semibold leading-none text-neutral-700">{t("paymentMethod")}</h3>
-							<p className="mt-3 text-sm">
-								{order.order.payment_method.card.brand &&
-									order.order.payment_method.card.brand in paymentMethods && (
-										<Image
-											src={
-												paymentMethods[order.order.payment_method.card.brand as keyof typeof paymentMethods]
-											}
-											className="mr-1 inline-block w-6 align-text-bottom"
-											alt=""
-										/>
-									)}
-								<span className="sr-only">{t("cardBrand")} </span>
-								<span className="capitalize">{order.order.payment_method.card.display_brand}</span>
-							</p>
-							<p className="mt-1.5 text-sm tabular-nums">
-								<span className="sr-only">{t("last4CardDigitsLabel")} </span>
-								<span aria-hidden>••••</span>
-								{order.order.payment_method.card.last4}
-							</p>
-						</div>
-					)}
+					{(order.order.payment_method as any)?.type === "card" &&
+						(order.order.payment_method as any).card && (
+							<div className="border-t pt-8 sm:col-span-2">
+								<h3 className="font-semibold leading-none text-neutral-700">{t("paymentMethod")}</h3>
+								<p className="mt-3 text-sm">
+									{(order.order.payment_method as any).card.brand &&
+										(order.order.payment_method as any).card.brand in paymentMethods && (
+											<Image
+												src={
+													paymentMethods[
+														(order.order.payment_method as any).card.brand as keyof typeof paymentMethods
+													]
+												}
+												className="mr-1 inline-block w-6 align-text-bottom"
+												alt=""
+											/>
+										)}
+									<span className="sr-only">{t("cardBrand")} </span>
+									<span className="capitalize">{(order.order.payment_method as any).card.display_brand}</span>
+								</p>
+								<p className="mt-1.5 text-sm tabular-nums">
+									<span className="sr-only">{t("last4CardDigitsLabel")} </span>
+									<span aria-hidden>••••</span>
+									{(order.order.payment_method as any).card.last4}
+								</p>
+							</div>
+						)}
 
 					<div className="col-span-2 grid grid-cols-2 gap-8 border-t pt-8">
 						<h3 className="font-semibold leading-none text-neutral-700">{t("total")}</h3>

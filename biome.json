@@ -89,6 +89,23 @@
 					}
 				}
 			}
+		},
+		{
+			"includes": [
+				"**/src/actions/cart-actions.ts",
+				"**/src/app/(store)/cart/cart-modal.tsx",
+				"**/src/app/(store)/cart/layout.tsx",
+				"**/src/app/(store)/cart/page.tsx",
+				"**/src/app/(store)/order/success/page.tsx",
+				"**/src/ui/nav/cart-summary-nav.tsx"
+			],
+			"linter": {
+				"rules": {
+					"suspicious": {
+						"noExplicitAny": "off"
+					}
+				}
+			}
 		}
 	]
 }

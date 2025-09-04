@@ -44,11 +44,15 @@ export async function POST(request: Request) {
 					const quantities = metadata.productQuantities.split(",").map((q) => parseInt(q, 10));
 
 					for (let i = 0; i < productIds.length; i++) {
-						const productId = productIds[i].trim();
+						const productId = productIds[i];
 						const quantity = quantities[i] || 1;
 
+						if (!productId) {
+							continue; // Skip if productId is undefined
+						}
+
 						try {
-							const product = await stripe.products.retrieve(productId);
+							const product = await stripe.products.retrieve(productId.trim());
 							if (product && product.metadata.stock !== undefined && product.metadata.stock !== "Infinity") {
 								const currentStock = parseInt(product.metadata.stock.toString(), 10);
 								const newStock = Math.max(0, currentStock - quantity);

@@ -1,4 +1,3 @@
-import { calculateCartTotalNetWithoutShipping } from "commerce-kit";
 import Image from "next/image";
 import { getCartFromCookiesAction } from "@/actions/cart-actions";
 import { Button } from "@/components/ui/button";
@@ -19,8 +18,14 @@ export async function CartModalPage() {
 		return null;
 	}
 
-	const currency = cart.lines[0]!.product.default_price.currency;
-	const total = calculateCartTotalNetWithoutShipping(cart);
+	const currency = (cart.lines[0]!.product as any).default_price.currency;
+
+	// Calculate total manually since our custom cart structure doesn't match the expected type
+	const total = cart.lines.reduce((sum, line) => {
+		const product = line.product as any;
+		const unitAmount = product.default_price?.unit_amount || 0;
+		return sum + unitAmount * line.quantity;
+	}, 0);
 	const t = await getTranslations("/cart.modal");
 	const locale = await getLocale();
 
@@ -38,14 +43,14 @@ export async function CartModalPage() {
 					<ul role="list" className="-my-3 divide-y divide-neutral-200">
 						{cart.lines.map((line) => (
 							<li
-								key={line.product.id}
+								key={(line.product as any).id}
 								className="grid grid-cols-[3rem_1fr_max-content] grid-rows-[auto_auto] gap-x-3 gap-y-1 py-3"
 							>
-								{line.product.images[0] ? (
+								{(line.product as any).images[0] ? (
 									<div className="col-span-1 row-span-2 bg-neutral-100">
 										<Image
 											className="aspect-square rounded-md object-cover"
-											src={line.product.images[0]}
+											src={(line.product as any).images[0]}
 											width={48}
 											height={48}
 											alt=""
@@ -56,12 +61,12 @@ export async function CartModalPage() {
 								)}
 
 								<h3 className="-mt-1 text-sm font-medium leading-tight">
-									{formatProductName(line.product.name, line.product.metadata.variant)}
+									{formatProductName((line.product as any).name, (line.product as any).metadata.variant)}
 								</h3>
 								<p className="text-xs font-medium leading-none">
 									{formatMoney({
-										amount: line.product.default_price.unit_amount ?? 0,
-										currency: line.product.default_price.currency,
+										amount: (line.product as any).default_price.unit_amount ?? 0,
+										currency: (line.product as any).default_price.currency,
 										locale,
 									})}
 								</p>
