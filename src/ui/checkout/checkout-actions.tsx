@@ -5,23 +5,15 @@ import { getCartFromCookiesAction } from "@/actions/cart-actions";
 import type { AddressSchema } from "@/ui/checkout/checkout-form-schema";
 
 export const saveShippingRateAction = async ({ shippingRateId }: { shippingRateId: string }) => {
-	const cart = await getCartFromCookiesAction();
-	if (!cart) {
-		throw new Error("No cart id found in cookies");
-	}
-
-	if (!shippingRateId || typeof shippingRateId !== "string") {
-		throw new Error("Invalid shipping rate id");
-	}
-
-	await Commerce.cartSaveShipping({ cartId: cart.cart.id, shippingRateId });
+	// For our custom cart system, shipping is handled differently
+	console.warn("saveShippingRateAction called but not implemented for custom cart system");
+	// For now, we'll just silently succeed since shipping is handled by Stripe Elements
+	return;
 };
 
 export const saveBillingAddressAction = async ({ billingAddress }: { billingAddress: AddressSchema }) => {
-	const cart = await getCartFromCookiesAction();
-	if (!cart) {
-		throw new Error("No cart id found in cookies");
-	}
-
-	await Commerce.cartSaveBillingAddress({ cartId: cart.cart.id, billingAddress });
+	// For our custom cart system, billing address is handled differently
+	console.warn("saveBillingAddressAction called but not implemented for custom cart system");
+	// For now, we'll just silently succeed since billing is handled by Stripe Elements
+	return;
 };

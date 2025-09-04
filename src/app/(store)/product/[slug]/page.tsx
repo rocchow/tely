@@ -19,7 +19,7 @@ import { getLocale, getTranslations } from "@/i18n/server";
 import { getRecommendedProducts } from "@/lib/search/trieve";
 import { cn, deslugify, formatMoney, formatProductName } from "@/lib/utils";
 import type { TrieveProductMetadata } from "@/scripts/upload-trieve";
-import { AddToCartButton } from "@/ui/add-to-cart-button";
+import { AddToCartWithQuantity } from "@/ui/add-to-cart-with-quantity";
 import { JsonLd, mappedProductToJsonLd } from "@/ui/json-ld";
 import { Markdown } from "@/ui/markdown";
 import { ProductImageGallery } from "@/ui/products/product-image-gallery";
@@ -183,7 +183,7 @@ export default async function SingleProductPage(props: {
 							</div>
 						)}
 
-						<AddToCartButton productId={product.id} disabled={product.metadata.stock <= 0} />
+						<AddToCartWithQuantity productId={product.id} disabled={product.metadata.stock <= 0} />
 					</div>
 				</div>
 			</StickyBottom>

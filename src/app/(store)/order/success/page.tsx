@@ -32,16 +32,67 @@ export default async function OrderDetailsPage(props: {
 	) {
 		return <div>Invalid order details</div>;
 	}
-	const order = await Commerce.orderGet(searchParams.payment_intent);
+	// For our custom cart system, get the payment intent directly
+	const stripe = Commerce.provider({
+		secretKey: process.env.STRIPE_SECRET_KEY,
+		tagPrefix: undefined,
+		cache: "no-store",
+	});
 
-	if (!order) {
+	const paymentIntent = await stripe.paymentIntents.retrieve(searchParams.payment_intent, {
+		expand: ["payment_method", "latest_charge", "customer"],
+	});
+
+	if (!paymentIntent) {
 		return <div>Order not found</div>;
 	}
+
+	// Reconstruct order data from payment intent
+	const productIds = paymentIntent.metadata.productIds;
+	const productQuantities = paymentIntent.metadata.productQuantities;
+
+	if (!productIds) {
+		return <div>Invalid order data</div>;
+	}
+
+	const productIdArray = productIds.split(",");
+	const quantityArray = productQuantities ? productQuantities.split(",").map((q) => parseInt(q, 10)) : [];
+	const lines = [];
+
+	for (let i = 0; i < productIdArray.length; i++) {
+		const productId = productIdArray[i];
+		const quantity = quantityArray[i] || 1;
+
+		const product = await stripe.products.retrieve(productId.trim(), {
+			expand: ["default_price"],
+		});
+
+		lines.push({
+			product: JSON.parse(JSON.stringify(product)),
+			quantity: quantity,
+		});
+	}
+
+	// Create mock order structure compatible with the UI
+	const order = {
+		order: {
+			id: paymentIntent.id,
+			status: paymentIntent.status,
+			amount_received: paymentIntent.amount_received,
+			currency: paymentIntent.currency,
+			metadata: paymentIntent.metadata,
+			payment_method: paymentIntent.payment_method,
+			shipping: paymentIntent.shipping,
+			receipt_email: paymentIntent.receipt_email,
+		},
+		lines: lines,
+		shippingRate: null, // We don't store shipping rate details in our system
+	};
 	const cookie = await getCartCookieJson();
 	const t = await getTranslations("/order.page");
 	const locale = await getLocale();
 
-	const isDigital = (lines: Commerce.Order["lines"]) => {
+	const isDigital = (lines: typeof order.lines) => {
 		return lines.some(({ product }) => Boolean(product.metadata.digitalAsset));
 	};
 

@@ -10,10 +10,12 @@ import { cn } from "@/lib/utils";
 
 export const AddToCartButton = ({
 	productId,
+	quantity = 1,
 	disabled,
 	className,
 }: {
 	productId: string;
+	quantity?: number;
 	disabled?: boolean;
 	className?: string;
 }) => {
@@ -28,25 +30,25 @@ export const AddToCartButton = ({
 			size="lg"
 			type="submit"
 			className={cn("rounded-full text-lg relative", className)}
-			onClick={async (e) => {
+			onClick={(e) => {
 				if (isDisabled) {
 					e.preventDefault();
 					return;
 				}
 
-				setOpen(true);
-
 				startTransition(async () => {
 					try {
 						const formData = new FormData();
 						formData.append("productId", productId);
+						formData.append("quantity", quantity.toString());
 						await addToCartAction(formData);
-						toast.success("Product added to cart!");
+						toast.success(`Added ${quantity} item${quantity > 1 ? "s" : ""} to cart!`);
+						// Only open cart modal after successful add
+						setOpen(true);
 					} catch (error) {
 						console.error("Add to cart error:", error);
 						const errorMessage = error instanceof Error ? error.message : "Failed to add product to cart";
 						toast.error(errorMessage);
-						setOpen(false); // Close cart modal on error
 					}
 				});
 			}}

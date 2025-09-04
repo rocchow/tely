@@ -8,7 +8,7 @@ export const env = createEnv({
 		// Can be provided via env or parameters to Commerce Kit, thus optional
 		STRIPE_SECRET_KEY: z.string().optional(),
 		// Required in Commerce Kit
-		STRIPE_CURRENCY: z.string().default("usd"),
+		STRIPE_CURRENCY: z.string().default("cad"),
 		STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
 		ENABLE_STRIPE_TAX: z
@@ -21,6 +21,10 @@ export const env = createEnv({
 
 		// Vercel Blob Storage
 		BLOB_READ_WRITE_TOKEN: z.string().optional(),
+
+		// Admin authentication
+		ADMIN_USERNAME: z.string().optional(),
+		ADMIN_PASSWORD: z.string().optional(),
 	},
 	client: {
 		// Can be provided via env or parameters to Commerce Kit, thus optional
@@ -49,6 +53,9 @@ export const env = createEnv({
 		TRIEVE_API_KEY: process.env.TRIEVE_API_KEY,
 
 		BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
+
+		ADMIN_USERNAME: process.env.ADMIN_USERNAME,
+		ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
 
 		NEXT_PUBLIC_LANGUAGE: process.env.NEXT_PUBLIC_LANGUAGE,
 	},

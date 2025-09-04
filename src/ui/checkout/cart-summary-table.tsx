@@ -131,7 +131,7 @@ export const CartSummaryTable = ({ cart, locale }: { cart: Commerce.Cart; locale
 					)}
 				</TableBody>
 				<TableFooter>
-					{optimisticCart.cart.taxBreakdown.map((tax, idx) => (
+					{optimisticCart.cart.taxBreakdown?.map((tax, idx) => (
 						<TableRow key={idx + tax.taxAmount} className="font-normal">
 							<TableCell className="hidden w-24 sm:table-cell"></TableCell>
 							<TableCell colSpan={3} className="text-right">

@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "@/i18n/server";
 import { formatMoney, formatProductName } from "@/lib/utils";
 import { YnsLink } from "@/ui/yns-link";
 import { CartAsideContainer } from "./cart-aside";
+import { ContinueShoppingButton } from "./continue-shopping-button";
 
 export async function CartModalPage() {
 	// const searchParams = await props.searchParams;
@@ -25,28 +26,28 @@ export async function CartModalPage() {
 
 	return (
 		<CartAsideContainer>
-			<div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6">
-				<div className="flex items-center justify-between">
-					<h2 className="text-lg font-semibold text-neutral-700">{t("title")}</h2>
-					<YnsLink replace href="/cart" className="text-sm text-muted-foreground underline">
+			<div className="flex-1 overflow-y-auto px-3 py-3 sm:px-4">
+				<div className="flex items-center justify-between mb-2">
+					<h2 className="text-sm font-semibold text-neutral-700">{t("title")}</h2>
+					<YnsLink replace href="/cart" className="text-xs text-muted-foreground underline">
 						{t("openFullView")}
 					</YnsLink>
 				</div>
 
-				<div className="mt-8">
-					<ul role="list" className="-my-6 divide-y divide-neutral-200">
+				<div className="mt-3">
+					<ul role="list" className="-my-3 divide-y divide-neutral-200">
 						{cart.lines.map((line) => (
 							<li
 								key={line.product.id}
-								className="grid grid-cols-[4rem_1fr_max-content] grid-rows-[auto_auto] gap-x-4 gap-y-2 py-6"
+								className="grid grid-cols-[3rem_1fr_max-content] grid-rows-[auto_auto] gap-x-3 gap-y-1 py-3"
 							>
 								{line.product.images[0] ? (
 									<div className="col-span-1 row-span-2 bg-neutral-100">
 										<Image
 											className="aspect-square rounded-md object-cover"
 											src={line.product.images[0]}
-											width={80}
-											height={80}
+											width={48}
+											height={48}
 											alt=""
 										/>
 									</div>
@@ -54,17 +55,17 @@ export async function CartModalPage() {
 									<div className="col-span-1 row-span-2" />
 								)}
 
-								<h3 className="-mt-1 font-semibold leading-tight">
+								<h3 className="-mt-1 text-sm font-medium leading-tight">
 									{formatProductName(line.product.name, line.product.metadata.variant)}
 								</h3>
-								<p className="text-sm font-medium leading-none">
+								<p className="text-xs font-medium leading-none">
 									{formatMoney({
 										amount: line.product.default_price.unit_amount ?? 0,
 										currency: line.product.default_price.currency,
 										locale,
 									})}
 								</p>
-								<p className="self-end text-sm font-medium text-muted-foreground">
+								<p className="self-end text-xs font-medium text-muted-foreground">
 									{t("quantity", { quantity: line.quantity })}
 								</p>
 							</li>
@@ -73,10 +74,10 @@ export async function CartModalPage() {
 				</div>
 			</div>
 
-			<div className="border-t border-neutral-200 px-4 py-6 sm:px-6">
+			<div className="border-t border-neutral-200 px-3 py-3 sm:px-4">
 				<div
 					id="cart-overlay-description"
-					className="flex justify-between text-base font-medium text-neutral-900"
+					className="flex justify-between text-sm font-medium text-neutral-900"
 				>
 					<p>{t("total")}</p>
 					<p>
@@ -87,10 +88,13 @@ export async function CartModalPage() {
 						})}
 					</p>
 				</div>
-				<p className="mt-0.5 text-sm text-neutral-500">{t("shippingAndTaxesInfo")}</p>
-				<Button asChild={true} size={"lg"} className="mt-6 w-full rounded-full text-lg">
-					<YnsLink href="/cart">{t("goToPaymentButton")}</YnsLink>
-				</Button>
+				<p className="mt-1 text-xs text-neutral-500">{t("shippingAndTaxesInfo")}</p>
+				<div className="mt-3 space-y-2">
+					<Button asChild={true} size={"sm"} className="w-full rounded-md text-sm">
+						<YnsLink href="/cart">{t("goToPaymentButton")}</YnsLink>
+					</Button>
+					<ContinueShoppingButton />
+				</div>
 			</div>
 			{/* {searchParams.add && <CartModalAddSideEffect productId={searchParams.add} />} } */}
 		</CartAsideContainer>

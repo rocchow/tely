@@ -31,30 +31,70 @@ export async function POST(request: Request) {
 
 	switch (event.type) {
 		case "payment_intent.succeeded":
-			const metadata = cartMetadataSchema.parse(event.data.object.metadata);
-			if (metadata.taxCalculationId) {
-				await stripe.tax.transactions.createFromCalculation({
-					calculation: metadata.taxCalculationId,
-					// @todo generate better references
-					reference: event.data.object.id.slice(3),
-				});
-			}
+			try {
+				// Check if this is our custom cart system or the original commerce-kit system
+				const metadata = event.data.object.metadata;
 
-			const products = await Commerce.getProductsFromMetadata(metadata);
+				// If it has our custom fields, handle it differently
+				if (metadata.productIds && metadata.productQuantities) {
+					console.log("Processing custom cart payment intent:", event.data.object.id);
 
-			for (const { product } of products) {
-				if (product && product.metadata.stock !== Infinity) {
-					await stripe.products.update(product.id, {
-						metadata: {
-							stock: product.metadata.stock - 1,
-						},
-					});
+					// Handle stock reduction for our custom cart
+					const productIds = metadata.productIds.split(",");
+					const quantities = metadata.productQuantities.split(",").map((q) => parseInt(q, 10));
 
-					revalidateTag(`product-${product.id}`);
+					for (let i = 0; i < productIds.length; i++) {
+						const productId = productIds[i].trim();
+						const quantity = quantities[i] || 1;
+
+						try {
+							const product = await stripe.products.retrieve(productId);
+							if (product && product.metadata.stock !== undefined && product.metadata.stock !== "Infinity") {
+								const currentStock = parseInt(product.metadata.stock.toString(), 10);
+								const newStock = Math.max(0, currentStock - quantity);
+
+								await stripe.products.update(productId, {
+									metadata: {
+										...product.metadata,
+										stock: newStock.toString(),
+									},
+								});
+
+								revalidateTag(`product-${productId}`);
+							}
+						} catch (productError) {
+							console.error(`Error updating stock for product ${productId}:`, productError);
+						}
+					}
+				} else {
+					// Handle original commerce-kit system
+					const parsedMetadata = cartMetadataSchema.parse(metadata);
+					if (parsedMetadata.taxCalculationId) {
+						await stripe.tax.transactions.createFromCalculation({
+							calculation: parsedMetadata.taxCalculationId,
+							reference: event.data.object.id.slice(3),
+						});
+					}
+
+					const products = await Commerce.getProductsFromMetadata(parsedMetadata);
+					for (const { product } of products) {
+						if (product && product.metadata.stock !== Infinity) {
+							await stripe.products.update(product.id, {
+								metadata: {
+									stock: product.metadata.stock - 1,
+								},
+							});
+							revalidateTag(`product-${product.id}`);
+						}
+					}
 				}
-			}
 
-			revalidateTag(`cart-${event.data.object.id}`);
+				revalidateTag(`cart-${event.data.object.id}`);
+			} catch (webhookError) {
+				console.error("Webhook processing error:", webhookError);
+				// Don't fail the webhook for processing errors
+				return Response.json({ received: true, error: "Processing failed but acknowledged" });
+			}
 
 			break;
 
