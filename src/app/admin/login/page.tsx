@@ -24,7 +24,7 @@ export default function AdminLoginPage() {
 				body: JSON.stringify({ username, password }),
 			});
 
-			const result = await response.json();
+			const result = (await response.json()) as { success?: boolean; error?: string };
 
 			if (response.ok && result.success) {
 				router.push("/admin/products");
