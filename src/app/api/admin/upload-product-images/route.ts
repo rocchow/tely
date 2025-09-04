@@ -11,6 +11,19 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
 		}
 
+		// Check if we're using placeholder keys (development mode)
+		const isDevMode = env.STRIPE_SECRET_KEY?.includes("placeholder") || !env.STRIPE_SECRET_KEY;
+
+		if (isDevMode) {
+			// Mock success response for development
+			console.log("Development mode: Mocking image upload success");
+			return NextResponse.json({
+				success: true,
+				message: "Development mode: Image upload mocked successfully",
+				imageUrls: ["https://via.placeholder.com/300x300/cccccc/666666?text=Mock+Image+1"],
+			});
+		}
+
 		// Initialize Stripe
 		const stripe = Commerce.provider({
 			tagPrefix: undefined,
