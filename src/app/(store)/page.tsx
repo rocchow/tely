@@ -31,13 +31,13 @@ export default async function Home() {
 						</YnsLink>
 					</div>
 					<Image
-						alt="Cup of Coffee"
+						alt="Tely Puzzle Mats - Premium Quality"
 						loading="eager"
 						priority={true}
 						className="rounded"
 						height={450}
-						width={450}
-						src="https://files.stripe.com/links/MDB8YWNjdF8xT3BaeG5GSmNWbVh6bURsfGZsX3Rlc3RfaDVvWXowdU9ZbWlobUIyaHpNc1hCeDM200NBzvUjqP"
+						width={1125}
+						src="https://m.media-amazon.com/images/S/stores-image-uploads-na-prod/9/AmazonStores/A2EUQ1WTGCTBG2/ba24506dfb73de8767f15616a05298b7.w3000.h600._CR0%2C0%2C3000%2C600_SX3000_.jpg"
 						style={{
 							objectFit: "cover",
 						}}
@@ -47,14 +47,6 @@ export default async function Home() {
 			</section>
 
 			<ProductList products={products} />
-
-			<section className="w-full py-8">
-				<div className="grid gap-8 lg:grid-cols-2">
-					{StoreConfig.categories.map(({ slug, image: src }) => (
-						<CategoryBox key={slug} categorySlug={slug} src={src} />
-					))}
-				</div>
-			</section>
 		</main>
 	);
 }

@@ -11,10 +11,6 @@ const links = [
 		label: name,
 		href: `/category/${slug}`,
 	})),
-	{
-		label: "Digital",
-		href: "/category/digital",
-	},
 ];
 
 export const NavMenu = () => {

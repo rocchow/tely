@@ -1,21 +1,17 @@
 import AccessoriesImage from "@/images/accessories.jpg";
-import ApparelImage from "@/images/apparel.jpg";
 
 export const config = {
-	categories: [
-		{ name: "Apparel", slug: "apparel", image: ApparelImage },
-		{ name: "Accessories", slug: "accessories", image: AccessoriesImage },
-	],
+	categories: [{ name: "Puzzle Mats", slug: "puzzle-mats", image: AccessoriesImage }],
 
 	social: {
-		x: "https://x.com/yourstore",
-		facebook: "https://facebook.com/yourstore",
+		x: "https://x.com/telystore",
+		facebook: "https://facebook.com/telystore",
 	},
 
 	contact: {
-		email: "support@yourstore.com",
-		phone: "+1 (555) 111-4567",
-		address: "123 Store Street, City, Country",
+		email: "support@tely.com",
+		phone: "+1 (555) 835-9000",
+		address: "Tely Headquarters, Puzzle City, USA",
 	},
 };
 
