@@ -8,7 +8,7 @@ export const env = createEnv({
 		// Can be provided via env or parameters to Commerce Kit, thus optional
 		STRIPE_SECRET_KEY: z.string().optional(),
 		// Required in Commerce Kit
-		STRIPE_CURRENCY: z.string(),
+		STRIPE_CURRENCY: z.string().default("usd"),
 		STRIPE_WEBHOOK_SECRET: z.string().optional(),
 
 		ENABLE_STRIPE_TAX: z
