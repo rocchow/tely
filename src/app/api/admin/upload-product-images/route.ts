@@ -50,10 +50,12 @@ export async function POST(request: NextRequest) {
 					name: file.name,
 					type: file.type,
 				},
-				purpose: "product_image",
+				purpose: "business_icon",
 			});
 
-			uploadedImages.push(stripeFile.url);
+			if (stripeFile.url) {
+				uploadedImages.push(stripeFile.url);
+			}
 		}
 
 		// Prepare metadata with additional images
@@ -76,9 +78,9 @@ export async function POST(request: NextRequest) {
 		});
 
 		// If this is the first image and there's no main image, set it as the main image
-		if (!currentProduct.images || currentProduct.images.length === 0) {
+		if ((!currentProduct.images || currentProduct.images.length === 0) && uploadedImages.length > 0) {
 			await stripe.products.update(productId, {
-				images: [uploadedImages[0]],
+				images: [uploadedImages[0]!], // We know this exists because we checked length > 0
 			});
 		}
 
