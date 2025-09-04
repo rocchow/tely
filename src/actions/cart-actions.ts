@@ -39,6 +39,10 @@ export async function getCartFromCookiesAction() {
 					const productId = productIdArray[i];
 					const quantity = quantityArray[i] || 1; // Default to 1 if quantity not found
 
+					if (!productId) {
+						continue; // Skip if productId is undefined
+					}
+
 					const product = await stripe.products.retrieve(productId.trim(), {
 						expand: ["default_price"],
 					});
