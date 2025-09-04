@@ -53,7 +53,7 @@ export function ProductImageUploader({ product }: ProductImageUploaderProps) {
 				body: formData,
 			});
 
-			const result = await response.json();
+			const result = (await response.json()) as { error?: string; success?: boolean };
 
 			if (response.ok) {
 				setMessage({ type: "success", text: `Successfully uploaded ${images.length} images!` });
