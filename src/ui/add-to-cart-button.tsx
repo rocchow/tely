@@ -1,6 +1,7 @@
 "use client";
 import { Loader2Icon } from "lucide-react";
 import { useTransition } from "react";
+import { toast } from "sonner";
 import { addToCartAction } from "@/actions/cart-actions";
 import { Button } from "@/components/ui/button";
 import { useCartModal } from "@/context/cart-modal";
@@ -36,9 +37,17 @@ export const AddToCartButton = ({
 				setOpen(true);
 
 				startTransition(async () => {
-					const formData = new FormData();
-					formData.append("productId", productId);
-					await addToCartAction(formData);
+					try {
+						const formData = new FormData();
+						formData.append("productId", productId);
+						await addToCartAction(formData);
+						toast.success("Product added to cart!");
+					} catch (error) {
+						console.error("Add to cart error:", error);
+						const errorMessage = error instanceof Error ? error.message : "Failed to add product to cart";
+						toast.error(errorMessage);
+						setOpen(false); // Close cart modal on error
+					}
 				});
 			}}
 			aria-disabled={isDisabled}

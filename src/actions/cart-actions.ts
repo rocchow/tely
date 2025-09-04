@@ -54,16 +54,34 @@ export async function clearCartCookieAction() {
 }
 
 export async function addToCartAction(formData: FormData) {
-	const productId = formData.get("productId");
-	if (!productId || typeof productId !== "string") {
-		throw new Error("Invalid product ID");
-	}
+	try {
+		const productId = formData.get("productId");
+		if (!productId || typeof productId !== "string") {
+			throw new Error("Invalid product ID");
+		}
 
-	const cart = await getCartFromCookiesAction();
+		// Get existing cart or create a new one
+		let cart = await getCartFromCookiesAction();
+		let cartId = cart?.cart.id;
 
-	const updatedCart = await Commerce.cartAdd({ productId, cartId: cart?.cart.id });
+		// If no cart exists, create one
+		if (!cartId) {
+			const newCart = await Commerce.cartCreate();
+			cartId = newCart.id;
+			await setCartCookieJson({
+				id: cartId,
+				linesCount: 0,
+			});
+		}
 
-	if (updatedCart) {
+		// Add product to cart
+		const updatedCart = await Commerce.cartAdd({ productId, cartId });
+
+		if (!updatedCart) {
+			throw new Error("Failed to add product to cart");
+		}
+
+		// Update cart cookie
 		await setCartCookieJson({
 			id: updatedCart.id,
 			linesCount: Commerce.cartCount(updatedCart.metadata),
@@ -71,6 +89,9 @@ export async function addToCartAction(formData: FormData) {
 
 		revalidateTag(`cart-${updatedCart.id}`);
 		return structuredClone(updatedCart);
+	} catch (error) {
+		console.error("Add to cart error:", error);
+		throw new Error("Failed to add product to cart. Please try again.");
 	}
 }
 
