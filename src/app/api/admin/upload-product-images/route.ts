@@ -11,18 +11,9 @@ export async function POST(request: NextRequest) {
 			return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
 		}
 
-		// Check if we're using placeholder keys (development mode)
-		const isDevMode = env.STRIPE_SECRET_KEY?.includes("placeholder") || !env.STRIPE_SECRET_KEY;
-
-		if (isDevMode) {
-			// Mock success response for development
-			console.log("Development mode: Mocking image upload success");
-			return NextResponse.json({
-				success: true,
-				message: "Development mode: Image upload mocked successfully",
-				imageUrls: ["https://via.placeholder.com/300x300/cccccc/666666?text=Mock+Image+1"],
-			});
-		}
+		// Add more detailed logging
+		console.log(`Processing upload for product: ${productId}`);
+		console.log(`Number of images to upload: ${formData.getAll("images").length}`);
 
 		// Initialize Stripe
 		const stripe = Commerce.provider({
@@ -53,21 +44,32 @@ export async function POST(request: NextRequest) {
 		const uploadedImages: string[] = [];
 
 		for (const file of imageFiles) {
-			// Convert File to Buffer
-			const buffer = Buffer.from(await file.arrayBuffer());
+			try {
+				console.log(`Uploading file: ${file.name} (${file.type}, ${file.size} bytes)`);
 
-			// Upload to Stripe Files API
-			const stripeFile = await stripe.files.create({
-				file: {
-					data: buffer,
-					name: file.name,
-					type: file.type,
-				},
-				purpose: "business_icon",
-			});
+				// Convert File to Buffer
+				const buffer = Buffer.from(await file.arrayBuffer());
+				console.log(`Buffer created, size: ${buffer.length} bytes`);
 
-			if (stripeFile.url) {
-				uploadedImages.push(stripeFile.url);
+				// Upload to Stripe Files API
+				console.log("Starting Stripe file upload...");
+				const stripeFile = await stripe.files.create({
+					file: {
+						data: buffer,
+						name: file.name,
+						type: file.type,
+					},
+					purpose: "business_icon",
+				});
+
+				console.log(`Stripe file uploaded successfully: ${stripeFile.id}`);
+				if (stripeFile.url) {
+					uploadedImages.push(stripeFile.url);
+					console.log(`File URL added: ${stripeFile.url}`);
+				}
+			} catch (fileError) {
+				console.error(`Failed to upload file ${file.name}:`, fileError);
+				// Continue with other files instead of failing completely
 			}
 		}
 
