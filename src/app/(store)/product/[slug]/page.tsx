@@ -83,7 +83,7 @@ export default async function SingleProductPage(props: {
 			const numB = parseInt(b.replace("image", ""), 10);
 			return numA - numB;
 		})
-		.map((key) => (product.metadata as Record<string, string>)[key])
+		.map((key) => product.metadata[key])
 		.filter((url): url is string => typeof url === "string" && url.startsWith("http"));
 
 	const images = [...product.images, ...additionalImages];
