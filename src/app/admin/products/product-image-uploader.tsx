@@ -16,9 +16,9 @@ export function ProductImageUploader({ product }: ProductImageUploaderProps) {
 	const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
 	// Get existing additional images from metadata
-	const existingImages = Object.keys(product.metadata)
-		.filter((key) => key.startsWith("image") && key !== "image1")
-		.map((key) => ({ key, url: product.metadata[key] }))
+	const existingImages = Object.entries(product.metadata)
+		.filter(([key]) => key.startsWith("image") && key !== "image1")
+		.map(([key, url]) => ({ key, url }))
 		.sort((a, b) => a.key.localeCompare(b.key));
 
 	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
