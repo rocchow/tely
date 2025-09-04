@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 						name: file.name,
 						type: file.type,
 					},
-					purpose: "business_icon",
+					purpose: "dispute_evidence",
 				});
 
 				console.log(`Stripe file uploaded successfully: ${stripeFile.id}`);
