@@ -1,4 +1,5 @@
 import { YnsLink } from "@/ui/yns-link";
+import LogoutButton from "./logout-button";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
 	return (
@@ -20,9 +21,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 								</YnsLink>
 							</nav>
 						</div>
-						<YnsLink href="/" className="text-sm text-gray-500 hover:text-gray-700">
-							← Back to Store
-						</YnsLink>
+						<div className="flex items-center space-x-4">
+							<LogoutButton />
+							<YnsLink href="/" className="text-sm text-gray-500 hover:text-gray-700">
+								← Back to Store
+							</YnsLink>
+						</div>
 					</div>
 				</div>
 			</header>

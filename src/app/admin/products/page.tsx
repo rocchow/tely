@@ -1,7 +1,14 @@
 import * as Commerce from "commerce-kit";
+import { redirect } from "next/navigation";
+import { checkAdminAuth } from "../auth";
 import { ProductImageUploader } from "./product-image-uploader";
 
 export default async function AdminProductsPage() {
+	const isAuthenticated = await checkAdminAuth();
+
+	if (!isAuthenticated) {
+		redirect("/admin/login");
+	}
 	const products = await Commerce.productBrowse({ first: 100 });
 
 	return (
