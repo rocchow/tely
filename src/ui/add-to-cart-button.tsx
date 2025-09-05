@@ -29,7 +29,10 @@ export const AddToCartButton = ({
 			id="button-add-to-cart"
 			size="lg"
 			type="submit"
-			className={cn("rounded-full text-lg relative", className)}
+			className={cn(
+				"rounded-full text-base sm:text-lg relative min-h-[48px] font-medium active:scale-95 transition-transform",
+				className,
+			)}
 			onClick={(e) => {
 				if (isDisabled) {
 					e.preventDefault();

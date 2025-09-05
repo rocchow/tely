@@ -32,12 +32,12 @@ export const NavMenu = () => {
 			</div>
 			<div className="sm:hidden flex items-center">
 				<NavMobileMenu>
-					<ul className="flex pb-8 flex-col items-stretch justify-center gap-x-1">
+					<ul className="flex flex-col items-stretch justify-center space-y-1">
 						{links.map((link) => (
 							<li key={link.href}>
 								<Link
 									href={link.href}
-									className="group inline-flex h-9 w-full items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden"
+									className="group flex min-h-[48px] w-full items-center justify-center rounded-lg bg-transparent px-6 py-3 text-base font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-hidden active:bg-accent/80"
 								>
 									{link.label}
 								</Link>

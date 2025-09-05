@@ -51,11 +51,11 @@ export const accountToWebsiteJsonLd = ({
 	return {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		name: account?.business_profile?.name ?? "TELY",
-		url: account?.business_profile?.url ?? "https://tely.com",
+		name: account?.business_profile?.name ?? "AsianPowder",
+		url: account?.business_profile?.url ?? "https://asianpowder.com",
 		mainEntityOfPage: {
 			"@type": "WebPage",
-			url: account?.business_profile?.url ?? "https://tely.com",
+			url: account?.business_profile?.url ?? "https://asianpowder.com",
 		},
 		...(logoUrl && {
 			image: {
@@ -65,8 +65,8 @@ export const accountToWebsiteJsonLd = ({
 		}),
 		publisher: {
 			"@type": "Organization",
-			name: account?.business_profile?.name ?? "TELY",
-			url: account?.business_profile?.url ?? "https://tely.com",
+			name: account?.business_profile?.name ?? "AsianPowder",
+			url: account?.business_profile?.url ?? "https://asianpowder.com",
 		},
 	};
 };

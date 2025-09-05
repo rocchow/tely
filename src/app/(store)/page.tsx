@@ -17,25 +17,27 @@ export default async function Home() {
 	return (
 		<main>
 			<section className="rounded bg-neutral-100 py-8 sm:py-12">
-				<div className="mx-auto grid grid-cols-1 items-center justify-items-center gap-8 px-8 sm:px-16 md:grid-cols-2">
-					<div className="max-w-md space-y-4">
-						<h2 className="text-balance text-3xl font-bold tracking-tight md:text-4xl">{t("hero.title")}</h2>
-						<p className="text-pretty text-neutral-600">{t("hero.description")}</p>
+				<div className="mx-auto grid grid-cols-1 items-center justify-items-center gap-6 sm:gap-8 px-6 sm:px-8 md:px-16 md:grid-cols-2">
+					<div className="max-w-md space-y-4 text-center md:text-left">
+						<h2 className="text-balance text-2xl sm:text-3xl font-bold tracking-tight md:text-4xl">
+							{t("hero.title")}
+						</h2>
+						<p className="text-pretty text-neutral-600 text-base sm:text-lg">{t("hero.description")}</p>
 						<YnsLink
-							className="inline-flex h-10 items-center justify-center rounded-full bg-neutral-900 px-6 font-medium text-neutral-50 transition-colors hover:bg-neutral-900/90 focus:outline-hidden focus:ring-1 focus:ring-neutral-950"
+							className="inline-flex min-h-[48px] items-center justify-center rounded-full bg-neutral-900 px-8 font-medium text-neutral-50 transition-all hover:bg-neutral-900/90 focus:outline-none focus:ring-2 focus:ring-neutral-950 focus:ring-offset-2 active:scale-95"
 							href={t("hero.link")}
 						>
 							{t("hero.action")}
 						</YnsLink>
 					</div>
 					<Image
-						alt="Tely Puzzle Mats - Premium Quality"
+						alt="AsianPowder Beauty Products - Premium Quality Cosmetics"
 						loading="eager"
 						priority={true}
 						className="rounded"
 						height={450}
 						width={1125}
-						src="https://m.media-amazon.com/images/S/stores-image-uploads-na-prod/9/AmazonStores/A2EUQ1WTGCTBG2/ba24506dfb73de8767f15616a05298b7.w3000.h600._CR0%2C0%2C3000%2C600_SX3000_.jpg"
+						src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80"
 						style={{
 							objectFit: "cover",
 						}}

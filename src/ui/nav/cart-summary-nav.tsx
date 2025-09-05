@@ -7,8 +7,8 @@ import { formatMoney } from "@/lib/utils";
 import { CartLink } from "./cart-link";
 
 const CartFallback = () => (
-	<div className="h-6 w-6 opacity-30">
-		<ShoppingBagIcon />
+	<div className="flex min-h-[44px] min-w-[44px] items-center justify-center -mr-2 sm:mr-0 opacity-30">
+		<ShoppingBagIcon className="h-6 w-6" />
 	</div>
 );
 
@@ -45,8 +45,8 @@ const CartSummaryNavInner = async () => {
 				<TooltipTrigger asChild>
 					<div>
 						<CartLink>
-							<ShoppingBagIcon />
-							<span className="absolute bottom-0 right-0 inline-flex h-5 w-5 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 bg-white text-center text-xs">
+							<ShoppingBagIcon className="h-6 w-6" />
+							<span className="absolute bottom-0 right-0 inline-flex h-5 w-5 translate-x-1/2 translate-y-1/2 items-center justify-center rounded-full border-2 bg-white text-center text-xs font-medium">
 								<span className="sr-only">{t("itemsInCart")}: </span>
 								{totalItems}
 							</span>

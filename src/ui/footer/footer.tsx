@@ -17,7 +17,7 @@ const sections = [
 		links: [
 			{
 				label: "Contact Us",
-				href: "mailto:support@tely.com",
+				href: "mailto:support@asianpowder.com",
 			},
 			{
 				label: "Shipping Info",
@@ -36,22 +36,25 @@ export async function Footer() {
 
 	return (
 		<footer className="w-full bg-neutral-50 p-6 text-neutral-800 md:py-12">
-			<div className="container flex max-w-7xl flex-row flex-wrap justify-center gap-16 text-sm sm:justify-between">
-				<div className="">
-					<div className="flex w-full max-w-sm flex-col gap-2">
-						<h3 className="font-semibold">{t("newsletterTitle")}</h3>
+			<div className="container flex max-w-7xl flex-col gap-8 text-sm sm:flex-row sm:justify-between sm:gap-16">
+				<div className="w-full sm:w-auto">
+					<div className="flex w-full max-w-sm flex-col gap-3">
+						<h3 className="font-semibold text-base">{t("newsletterTitle")}</h3>
 						<Newsletter />
 					</div>
 				</div>
 
-				<nav className="grid grid-cols-2 gap-16">
+				<nav className="grid grid-cols-2 gap-8 sm:gap-16 w-full sm:w-auto">
 					{sections.map((section) => (
 						<section key={section.header}>
-							<h3 className="mb-2 font-semibold">{section.header}</h3>
-							<ul role="list" className="grid gap-1">
+							<h3 className="mb-3 font-semibold text-base">{section.header}</h3>
+							<ul role="list" className="grid gap-2">
 								{section.links.map((link) => (
 									<li key={link.label}>
-										<YnsLink className="underline-offset-4 hover:underline" href={link.href}>
+										<YnsLink
+											className="inline-flex min-h-[44px] items-center underline-offset-4 hover:underline focus:outline-none focus:underline"
+											href={link.href}
+										>
 											{link.label}
 										</YnsLink>
 									</li>
@@ -61,25 +64,25 @@ export async function Footer() {
 					))}
 				</nav>
 			</div>
-			<div className="container mt-8 flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-neutral-500 md:flex-row">
-				<div>
-					<p>© 2024 Your Next Store</p>
-					<p>Delightful commerce for everyone</p>
+			<div className="container mt-8 flex max-w-7xl flex-col items-center justify-between gap-6 text-sm text-neutral-500 md:flex-row">
+				<div className="text-center md:text-left">
+					<p>© 2024 AsianPowder Beauty</p>
+					<p>Authentic Asian beauty for everyone</p>
 				</div>
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-6">
 					<YnsLink
-						className="inline-flex items-center gap-1 transition-colors hover:text-neutral-700"
-						href="https://x.com/zaiste"
+						className="inline-flex min-h-[44px] items-center gap-2 transition-colors hover:text-neutral-700 focus:outline-none focus:text-neutral-700"
+						href="https://x.com/asianpowder"
 					>
-						<TwitterIcon className="h-4 w-4" /> @zaiste
+						<TwitterIcon className="h-4 w-4" /> @asianpowder
 						<span className="sr-only">Twitter</span>
 					</YnsLink>
 					<YnsLink
-						className="inline-flex items-center gap-1 transition-colors hover:text-neutral-700"
-						href="https://x.com/typeofweb"
+						className="inline-flex min-h-[44px] items-center gap-2 transition-colors hover:text-neutral-700 focus:outline-none focus:text-neutral-700"
+						href="https://instagram.com/asianpowder"
 					>
-						<TwitterIcon className="h-4 w-4" /> @typeofweb
-						<span className="sr-only">Twitter</span>
+						<TwitterIcon className="h-4 w-4" /> @asianpowder
+						<span className="sr-only">Instagram</span>
 					</YnsLink>
 				</div>
 			</div>

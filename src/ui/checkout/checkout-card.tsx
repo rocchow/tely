@@ -28,9 +28,9 @@ export const CheckoutCard = async ({ cart }: { cart: Commerce.Cart }) => {
 	const locale = await getLocale();
 
 	return (
-		<section className="max-w-md pb-12">
-			<h2 className="text-3xl font-bold leading-none tracking-tight">{t("checkoutTitle")}</h2>
-			<p className="mb-4 mt-2 text-sm text-muted-foreground">{t("checkoutDescription")}</p>
+		<section className="w-full max-w-md pb-12 px-4 sm:px-0">
+			<h2 className="text-2xl sm:text-3xl font-bold leading-tight tracking-tight">{t("checkoutTitle")}</h2>
+			<p className="mb-6 mt-3 text-base text-muted-foreground">{t("checkoutDescription")}</p>
 			<StripePayment
 				shippingRateId={cart.cart.metadata.shippingRateId}
 				shippingRates={structuredClone(shippingRates)}

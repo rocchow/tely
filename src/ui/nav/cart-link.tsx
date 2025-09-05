@@ -18,7 +18,7 @@ export const CartLink = ({ children }: { children: ReactNode }) => {
 				setOpen(true);
 			}}
 			scroll={false}
-			className="relative block h-6 w-6"
+			className="relative flex min-h-[44px] min-w-[44px] items-center justify-center -mr-2 sm:mr-0"
 			prefetch={true}
 		>
 			{children}

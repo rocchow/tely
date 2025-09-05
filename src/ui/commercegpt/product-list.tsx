@@ -6,10 +6,16 @@ import { formatMoney } from "@/lib/utils";
 import { YnsLink } from "@/ui/yns-link";
 
 export const ProductList = ({ products }: { products: Commerce.MappedProduct[] }) => {
+	// Filter out products marked as hidden
+	const visibleProducts = products.filter((product) => {
+		const metadata = product.metadata as typeof product.metadata & { hidden?: string | boolean };
+		return !metadata.hidden && product.metadata.slug && product.metadata.slug !== "hidden";
+	});
+
 	return (
 		<>
-			<ul className="max-w-(--breakpoint-lg) grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-				{products.map((product, idx) => {
+			<ul className="max-w-(--breakpoint-lg) grid grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+				{visibleProducts.map((product, idx) => {
 					return (
 						<li key={product.id} className="group">
 							<YnsLink href={`/product/${product.metadata.slug}`}>
@@ -28,8 +34,10 @@ export const ProductList = ({ products }: { products: Commerce.MappedProduct[] }
 											/>
 										</div>
 									)}
-									<div className="p-4">
-										<h2 className="text-lg font-semibold text-neutral-700">{product.name}</h2>
+									<div className="p-2 sm:p-4">
+										<h2 className="text-sm sm:text-lg font-semibold text-neutral-700 line-clamp-2">
+											{product.name}
+										</h2>
 										<footer className="text-sm font-medium text-neutral-900">
 											{product.default_price.unit_amount && (
 												<p>

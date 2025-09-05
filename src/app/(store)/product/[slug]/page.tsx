@@ -123,11 +123,13 @@ export default async function SingleProductPage(props: {
 			</Breadcrumb>
 
 			<StickyBottom product={product} locale={locale}>
-				<div className="mt-4 grid gap-4 lg:grid-cols-12">
+				<div className="mt-4 grid gap-6 lg:grid-cols-12">
 					<div className="lg:col-span-5 lg:col-start-8">
-						<h1 className="text-3xl font-bold leading-none tracking-tight text-foreground">{product.name}</h1>
+						<h1 className="text-2xl sm:text-3xl font-bold leading-tight tracking-tight text-foreground">
+							{product.name}
+						</h1>
 						{product.default_price.unit_amount && (
-							<p className="mt-2 text-2xl font-medium leading-none tracking-tight text-foreground/70">
+							<p className="mt-3 text-xl sm:text-2xl font-semibold leading-none tracking-tight text-foreground/90">
 								{formatMoney({
 									amount: product.default_price.unit_amount,
 									currency: product.default_price.currency,
@@ -135,7 +137,9 @@ export default async function SingleProductPage(props: {
 								})}
 							</p>
 						)}
-						<div className="mt-2">{product.metadata.stock <= 0 && <div>Out of stock</div>}</div>
+						<div className="mt-2">
+							{product.metadata.stock <= 0 && <div className="text-red-600 font-medium">Out of stock</div>}
+						</div>
 					</div>
 
 					<div className="lg:col-span-7 lg:row-span-3 lg:row-start-1">
@@ -144,20 +148,24 @@ export default async function SingleProductPage(props: {
 						<ProductImageGallery images={images} productName={product.name} className="w-full" />
 					</div>
 
-					<div className="grid gap-8 lg:col-span-5">
+					<div className="grid gap-6 sm:gap-8 lg:col-span-5">
 						<section>
 							<h2 className="sr-only">{t("descriptionTitle")}</h2>
-							<div className="prose text-secondary-foreground">
+							<div className="prose prose-sm sm:prose text-secondary-foreground max-w-none">
 								<Markdown source={product.description || ""} />
 							</div>
 						</section>
 
 						{variants.length > 1 && (
-							<div className="grid gap-2">
-								<p className="text-base font-medium" id="variant-label">
+							<div className="grid gap-3">
+								<p className="text-base font-semibold" id="variant-label">
 									{t("variantTitle")}
 								</p>
-								<ul role="list" className="grid grid-cols-4 gap-2" aria-labelledby="variant-label">
+								<ul
+									role="list"
+									className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
+									aria-labelledby="variant-label"
+								>
 									{variants.map((variant) => {
 										const isSelected = selectedVariant === variant.metadata.variant;
 										return (
@@ -168,8 +176,8 @@ export default async function SingleProductPage(props: {
 														prefetch={true}
 														href={`/product/${variant.metadata.slug}?variant=${variant.metadata.variant}`}
 														className={cn(
-															"flex cursor-pointer items-center justify-center gap-2 rounded-md border p-2 transition-colors hover:bg-neutral-100",
-															isSelected && "border-black bg-neutral-50 font-medium",
+															"flex min-h-[44px] cursor-pointer items-center justify-center gap-2 rounded-lg border p-3 transition-all hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 active:scale-95",
+															isSelected && "border-black bg-neutral-50 font-semibold shadow-sm",
 														)}
 														aria-selected={isSelected}
 													>
@@ -209,37 +217,45 @@ async function SimilarProducts({ id }: { id: string }) {
 	}
 
 	return (
-		<section className="py-12">
-			<div className="mb-8">
-				<h2 className="text-2xl font-bold tracking-tight">You May Also Like</h2>
+		<section className="py-8 sm:py-12">
+			<div className="mb-6 sm:mb-8">
+				<h2 className="text-xl sm:text-2xl font-bold tracking-tight">You May Also Like</h2>
 			</div>
-			<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+			<div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
 				{products.map((product) => {
 					const trieveMetadata = product.metadata as TrieveProductMetadata;
 					return (
-						<div key={product.tracking_id} className="bg-card rounded overflow-hidden shadow-sm group">
+						<div key={product.tracking_id} className="bg-card rounded-lg overflow-hidden shadow-sm group">
 							{trieveMetadata.image_url && (
-								<YnsLink href={`${publicUrl}${product.link}`} className="block" prefetch={false}>
+								<YnsLink
+									href={`${publicUrl}${product.link}`}
+									className="block focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-lg"
+									prefetch={false}
+								>
 									<Image
 										className={
-											"w-full rounded-lg bg-neutral-100 object-cover object-center group-hover:opacity-80 transition-opacity"
+											"w-full aspect-square rounded-t-lg bg-neutral-100 object-cover object-center group-hover:opacity-80 transition-all group-active:scale-95"
 										}
 										src={trieveMetadata.image_url}
 										width={300}
 										height={300}
 										sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 300px"
-										alt=""
+										alt={`${trieveMetadata.name} product image`}
 									/>
 								</YnsLink>
 							)}
-							<div className="p-4">
-								<h3 className="text-lg font-semibold mb-2">
-									<YnsLink href={product.link || "#"} className="hover:text-primary" prefetch={false}>
+							<div className="p-2 sm:p-4">
+								<h3 className="text-sm sm:text-base lg:text-lg font-semibold mb-2 line-clamp-2">
+									<YnsLink
+										href={product.link || "#"}
+										className="hover:text-primary focus:outline-none focus:text-primary"
+										prefetch={false}
+									>
 										{trieveMetadata.name}
 									</YnsLink>
 								</h3>
 								<div className="flex items-center justify-between">
-									<span>
+									<span className="text-sm sm:text-base font-medium text-neutral-900">
 										{formatMoney({
 											amount: trieveMetadata.amount,
 											currency: trieveMetadata.currency,

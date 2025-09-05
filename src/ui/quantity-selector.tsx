@@ -39,26 +39,26 @@ export function QuantitySelector({
 	const decrement = () => updateQuantity(quantity - 1);
 
 	return (
-		<div className={`flex items-center space-x-2 ${className || ""}`}>
+		<div className={`flex items-center space-x-3 ${className || ""}`}>
 			<Button
 				type="button"
 				variant="outline"
 				size="icon"
 				onClick={decrement}
 				disabled={quantity <= min}
-				className="h-8 w-8 shrink-0 rounded-md"
+				className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-lg active:scale-95 transition-transform"
 			>
-				<Minus className="h-4 w-4" />
+				<Minus className="h-4 w-4 sm:h-5 sm:w-5" />
 				<span className="sr-only">Decrease quantity</span>
 			</Button>
-			<div className="flex-1">
+			<div className="flex-1 min-w-0">
 				<Input
 					type="number"
 					value={quantity}
 					onChange={handleInputChange}
 					min={min}
 					max={max}
-					className="h-8 w-16 text-center text-sm"
+					className="h-10 sm:h-12 w-full text-center text-base sm:text-lg font-medium border-2 focus:border-primary"
 				/>
 			</div>
 			<Button
@@ -67,9 +67,9 @@ export function QuantitySelector({
 				size="icon"
 				onClick={increment}
 				disabled={quantity >= max}
-				className="h-8 w-8 shrink-0 rounded-md"
+				className="h-10 w-10 sm:h-12 sm:w-12 shrink-0 rounded-lg active:scale-95 transition-transform"
 			>
-				<Plus className="h-4 w-4" />
+				<Plus className="h-4 w-4 sm:h-5 sm:w-5" />
 				<span className="sr-only">Increase quantity</span>
 			</Button>
 		</div>
